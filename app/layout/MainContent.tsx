@@ -1,5 +1,6 @@
 import React from 'react'
 import Dasboard from '../component/Dasboard'
+import Staff from '../component/staff/Staff'
 
 const MainContent = ({contentIndex}:any) => {
     console.log(contentIndex)
@@ -8,8 +9,13 @@ const MainContent = ({contentIndex}:any) => {
         {
             contentIndex.first == 0 && (
                 <Dasboard/>
+            )    
+        }
+        {
+          contentIndex.first == 4 && 
+            (
+              <Staff index={contentIndex.second} />
             )
-            
         }
     </div>
   )
