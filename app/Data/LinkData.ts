@@ -41,8 +41,6 @@ const navbarItems = [
         text: 'Apps',
         subLinks: [
             { text: 'Chats' },
-            { text: 'Calls' },
-            { text: 'Emails' },
         ],
     },
     {
