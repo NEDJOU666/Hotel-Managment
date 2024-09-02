@@ -1,0 +1,102 @@
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #2d3748;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+}
+
+.button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: rgb(24, 235, 24);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #2b6cb0;
+}
+
+.staffList {
+  margin-top: 20px;
+}
+
+.staffCard {
+  padding: 20px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.staffName {
+  font-size: 1.2rem;
+  color: #2d3748;
+}
+
+.staffPosition {
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.editButton {
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  color: #fff;
+  background-color: rgb(24, 235, 24);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.editButton:hover {
+  background-color: #2f855a;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.table th,
+.table td {
+  border: 1px solid rgb(221, 221, 221);
+  padding: 8px;
+  text-align: left;
+}
+
+.table th {
+  background-color: rgb(242, 242, 242);
+  font-weight: bold;
+}
