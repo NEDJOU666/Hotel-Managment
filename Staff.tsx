@@ -6,6 +6,10 @@ import styles from './Staff.module.css';
 interface Staff {
   name: string;
   position: string;
+  department: string;
+  contact: string;
+  dateOfHire: string;
+  salary: number;
 }
 
 const Staff = ({ index }: any) => {
@@ -16,8 +20,22 @@ const Staff = ({ index }: any) => {
   }, [index]);
 
   const [staff, setStaff] = useState<Staff[]>([
-    { name: 'John Doe', position: 'Manager' },
-    { name: 'Jane Smith', position: 'Receptionist' },
+    {
+      name: 'John Doe',
+      position: 'Manager',
+      department: 'Administration',
+      contact: '123-456-7890',
+      dateOfHire: '2021-06-01',
+      salary: 50000,
+    },
+    {
+      name: 'Jane Smith',
+      position: 'Receptionist',
+      department: 'Front Desk',
+      contact: '987-654-3210',
+      dateOfHire: '2020-09-15',
+      salary: 30000,
+    },
   ]);
 
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
@@ -50,6 +68,10 @@ const Staff = ({ index }: any) => {
               <tr>
                 <th>Name</th>
                 <th>Position</th>
+                <th>Department</th>
+                <th>Contact</th>
+                <th>Date of Hire</th>
+                <th>Salary</th>
               </tr>
             </thead>
             <tbody>
@@ -57,6 +79,10 @@ const Staff = ({ index }: any) => {
                 <tr key={i}>
                   <td>{member.name}</td>
                   <td>{member.position}</td>
+                  <td>{member.department}</td>
+                  <td>{member.contact}</td>
+                  <td>{member.dateOfHire}</td>
+                  <td>{member.salary}</td>
                 </tr>
               ))}
             </tbody>
@@ -72,3 +98,5 @@ const Staff = ({ index }: any) => {
 };
 
 export default Staff;
+
+
