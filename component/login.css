@@ -1,0 +1,23 @@
+@tailwind base;
+
+@layer base{
+    .input-box{
+        @apply  border-green-400 w-[90%] pl-2 pr-4 py-3 rounded-md content-start flex justify-between border-[2px];
+    }
+    input{
+        @apply outline-none text-slate-700;
+    }
+}
+.shrink-animation {
+    animation: shrink 7s linear forwards;
+  }
+
+  @keyframes shrink {
+    from {
+      width: 100%;
+    }
+    to {
+      width: 0%;
+    }
+  }
+
