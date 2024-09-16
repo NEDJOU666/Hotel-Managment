@@ -1,39 +1,45 @@
 import React from 'react';
 import styles from './Staff.module.css';
 
-interface StaffListProps {
-  staff: Staff[];
-  onEdit: (staff: Staff) => void;
-  setIndex: (index: number) => void;
-}
-
 interface Staff {
   name: string;
   position: string;
   department: string;
-  contact: string;
   dateOfHire: string;
   salary: number;
 }
 
-const StaffList = ({ staff, onEdit, setIndex }: Readonly<StaffListProps>) => {
+interface StaffListProps {
+  staff: Staff[];
+  onEdit: (staff: Staff) => void;
+  onDelete: (staff: Staff) => void;  // Add delete handler
+  setIndex: (index: number) => void;
+}
+
+const StaffList: React.FC<StaffListProps> = ({ staff, onEdit, onDelete, setIndex }) => {
   return (
-    <div className={`${styles.staffList} overflow-y-auto !h-[290px] mb-1`}>
+    <div className={styles.staffList}>
       {staff.map((member, index) => (
         <div key={index} className={styles.staffCard}>
           <div>
-            <div className={styles.staffName}>{member.name}</div>
-            <div className={styles.staffPosition}>{member.position}</div>
+            <p className={styles.staffName}>{member.name}</p>
+            <p className={styles.staffPosition}>{member.position}</p>
+            <p className={styles.staffDepartment}>{member.department}</p>
+            <p className={styles.staffDetails}>Hired on: {member.dateOfHire}</p>
+            <p className={styles.staffDetails}>Salary: {member.salary} XAF</p>
           </div>
-          <button
-            onClick={() => {
-              onEdit(member);
-              setIndex(1);
-            }}
-            className={styles.editButton}
-          >
-            Edit
-          </button>
+          <div>
+            <button 
+              className={styles.editButton} 
+              onClick={() => onEdit(member)}>
+              Edit
+            </button>
+            <button 
+              className={styles.deleteButton} 
+              onClick={() => onDelete(member)}> {/* Delete button */}
+              Delete
+            </button>
+          </div>
         </div>
       ))}
     </div>
