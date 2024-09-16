@@ -1,17 +1,25 @@
-"use client"
 import React, { useState } from 'react';
-import { CustomerDetails } from '../interface/customerDetails';
-import { useRouter } from 'next/navigation';
-import { urlFor } from '@/sanity/lib/image';
+
+interface CustomerDetails {
+  id: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  picture?: string; // Optional field for storing the picture URL or base64 string
+  birthday?: string;
+  favoriteAmenities?: string;
+  roomPreferences?: string;
+  Nationality?: string;
+}
 
 interface AllCustomersFormProps {
   customers: CustomerDetails[];
-  onDeleteClick: (customerId: string) => void;
+  onEditClick: (customer: CustomerDetails) => void;
+  onDeleteClick: (customerId: number) => void;
 }
 
-const AllCustomersForm: React.FC<AllCustomersFormProps> = ({ customers, onDeleteClick }) => {
+const AllCustomersForm: React.FC<AllCustomersFormProps> = ({ customers, onEditClick, onDeleteClick }) => {
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerDetails | null>(null);
-  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState<string>(''); // State for search term
 
   const handleViewDetailsClick = (customer: CustomerDetails) => {
@@ -98,9 +106,6 @@ const AllCustomersForm: React.FC<AllCustomersFormProps> = ({ customers, onDelete
     borderRadius: '10px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   };
-  const handleEdit = (_id:string) => {
-    router.push(`/customer/editcustomers/${_id}`)
-  }
 
   return (
     <div style={containerStyle}>
@@ -125,10 +130,10 @@ const AllCustomersForm: React.FC<AllCustomersFormProps> = ({ customers, onDelete
               <button onClick={() => handleViewDetailsClick(customer)} style={buttonStyle}>
                 View Details
               </button>
-              <button onClick={() => handleEdit(customer._id ? customer._id : "") } style={editButtonStyle}>
+              <button onClick={() => onEditClick(customer)} style={editButtonStyle}>
                 Edit
               </button>
-              <button onClick={() => onDeleteClick(customer._id ? customer._id : "")} style={deleteButtonStyle}>
+              <button onClick={() => onDeleteClick(customer.id)} style={deleteButtonStyle}>
                 Delete
               </button>
             </div>
@@ -151,7 +156,7 @@ const AllCustomersForm: React.FC<AllCustomersFormProps> = ({ customers, onDelete
           {selectedCustomer.picture && (
             <div>
               <strong>Picture:</strong>
-              <img src={urlFor(selectedCustomer.picture).url()} alt="Customer" style={{ width: '100px', borderRadius: '10px' }} />
+              <img src={selectedCustomer.picture} alt="Customer" style={{ width: '100px', borderRadius: '10px' }} />
             </div>
           )}
           {selectedCustomer.birthday && (

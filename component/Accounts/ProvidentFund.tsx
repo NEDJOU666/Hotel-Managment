@@ -26,11 +26,11 @@ const ProvidentFund: React.FC = () => {
   return (
     <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
       <h2 style={{ color: 'green', textAlign: 'center' }}>Provident Fund</h2>
-      <p style={{ fontSize: '18px', textAlign: 'center' }}><strong>Total Balance:</strong> ${getTotalBalance().toFixed(2)}</p>
+      <p style={{ fontSize: '18px', textAlign: 'center' }}><strong>Total Balance:</strong> XAF{getTotalBalance().toFixed(2)}</p>
       <ul style={{ listStyleType: 'none', padding: '0' }}>
         {contributions.map(contribution => (
           <li key={contribution.id} style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
-            <strong>{contribution.date}:</strong> {contribution.name} contributed ${contribution.amount.toFixed(2)}
+            <strong>{contribution.date}:</strong> {contribution.name} contributed XAF{contribution.amount.toFixed(2)}
           </li>
         ))}
       </ul>

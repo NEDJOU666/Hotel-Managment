@@ -1,16 +1,32 @@
-"use client"
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { BookingDetails } from '../interface/bookingDetails';
+
+interface Guest {
+  name: string;
+  age: number;
+}
+
+interface BookingDetails {
+  id: number;
+  name: string;
+  email: string;
+  checkInDate: string;
+  checkOutDate: string;
+  roomType: string;
+  roomComfort: string; 
+  roomId: string;  // Ensure this matches with Booking
+  amountPaid: number;  // Ensure this matches with Booking
+  totalAmount: number;
+  guests: Guest[];
+  currency: string;  // Ensure this matches with Booking
+}
 
 interface AllBookingsProps {
   bookings: BookingDetails[];
-  onDeleteClick: (bookingId: string) => void;
+  onEditClick: (booking: BookingDetails) => void;
+  onDeleteClick: (bookingId: number) => void;
 }
 
-const AllBookings: React.FC<AllBookingsProps> = ({ bookings, onDeleteClick }) => {
-  console.log(bookings)
-  const [deleted,setDeleteds] = useState(false)
+const AllBookings: React.FC<AllBookingsProps> = ({ bookings, onEditClick, onDeleteClick }) => {
   const [selectedBooking, setSelectedBooking] = useState<BookingDetails | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>(''); // State to track the search term
 
@@ -22,19 +38,14 @@ const AllBookings: React.FC<AllBookingsProps> = ({ bookings, onDeleteClick }) =>
     }
   };
 
-  const handleDeleteClick = (bookingId: string) => {
+  const handleDeleteClick = (bookingId: number) => {
     if (selectedBooking && selectedBooking.id === bookingId) {
       setSelectedBooking(null);
     }
-    // onDeleteClick(bookingId);
+    onDeleteClick(bookingId);
   };
 
-  const router = useRouter()
-  const handleEdit = (id:string) =>{
-       router.replace(`/booking/edit booking/${id}`)
-  }
-
-  const totalAmountPaid = bookings?.reduce((total, booking) => total + booking.totalAmountPaid, 0);
+  const totalAmountPaid = bookings.reduce((total, booking) => total + booking.totalAmount, 0);
 
   // Filter bookings based on the search term
   const filteredBookings = bookings.filter(
@@ -115,15 +126,11 @@ const AllBookings: React.FC<AllBookingsProps> = ({ bookings, onDeleteClick }) =>
               <button onClick={() => handleViewDetailsClick(booking)} style={buttonStyle}>
                 View Details
               </button>
-              <button onClick={() => handleEdit(booking._id)} style={editButtonStyle}>
+              <button onClick={() => onEditClick(booking)} style={editButtonStyle}>
                 Edit
               </button>
-              <button onClick={() => {
-                setDeleteds(true)
-                onDeleteClick(booking._id)
-                setDeleteds(false)
-                }} style={deleteButtonStyle}>
-                {deleted ? 'Deleting...' : 'Cancel'}
+              <button onClick={() => handleDeleteClick(booking.id)} style={deleteButtonStyle}>
+                Delete
               </button>
             </div>
           </li>
@@ -138,11 +145,11 @@ const AllBookings: React.FC<AllBookingsProps> = ({ bookings, onDeleteClick }) =>
           <p><strong>Check-in Date:</strong> {selectedBooking.checkInDate}</p>
           <p><strong>Check-out Date:</strong> {selectedBooking.checkOutDate}</p>
           <p><strong>Room Type:</strong> {selectedBooking.roomType}</p>
-          <p><strong>Room Comfort:</strong> {selectedBooking.roomConfort}</p>
-          <p><strong>Amount Paid:</strong> {selectedBooking.totalAmountPaid.toLocaleString('en-US', { style: 'currency', currency: 'XAF' })}</p>
+          <p><strong>Room Comfort:</strong> {selectedBooking.roomComfort}</p>
+          <p><strong>Amount Paid:</strong> {selectedBooking.totalAmount.toLocaleString('en-US', { style: 'currency', currency: 'XAF' })}</p>
           <p><strong>Guests:</strong></p>
           <ul>
-            {selectedBooking.guests && selectedBooking.guests.map((guest, index) => (
+            {selectedBooking.guests.map((guest, index) => (
               <li key={index}>{guest.name} ({guest.age} years old)</li>
             ))}
           </ul>

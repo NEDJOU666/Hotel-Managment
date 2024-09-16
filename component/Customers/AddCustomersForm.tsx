@@ -1,18 +1,24 @@
-"use client"
 import React, { useState } from 'react';
-import { CustomerDetails } from '../interface/customerDetails';
-import { client } from '@/sanity/lib/client';
+
+interface CustomerDetails {
+  id: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  picture?: string; // Optional field for storing the picture URL or base64 string
+  birthday: string;
+  favoriteAmenities: string;
+  roomPreferences: string;
+  Nationality: string;
+}
 
 interface AddCustomerFormProps {
   onAddCustomer: (newCustomer: CustomerDetails) => void;
-  newId:number;
 }
 
-const AddCustomerForm: React.FC<AddCustomerFormProps> = ({ onAddCustomer,newId }) => {
-  const [index,setIndex] = useState(newId+1)
-  const [image,setImage] = useState<File>()
+const AddCustomerForm: React.FC<AddCustomerFormProps> = ({ onAddCustomer }) => {
   const [newCustomer, setNewCustomer] = useState<CustomerDetails>({
-    id: `CTM-${index<10 ? "00": index<100 ? "0":""}${index}`,
+    id: Date.now(),
     name: '',
     email: '',
     phoneNumber: '',
@@ -33,34 +39,23 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({ onAddCustomer,newId }
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setImage(file)// Convert image file to base64 string
-    }
-  };
-  const uploadImage = async (file: any) => {
-    try {
-    const formData = new FormData();
-    formData.append('file', file);
+      const reader = new FileReader();
 
-    const uploadedImage = await client.assets.upload('image', file);
-      // Return the image asset ID
-      return uploadedImage._id;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      return "bad request"; // Rethrow the error for handling elsewhere
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+        setNewCustomer({ ...newCustomer, picture: reader.result as string });
+      };
+
+      reader.readAsDataURL(file); // Convert image file to base64 string
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const imageAssetId = image ? await uploadImage(image) : "";
-    if(imageAssetId == "bad request"){
-      return
-    }
-    const newCustomerUpdated = { ...newCustomer, picture: imageAssetId };
-    onAddCustomer(newCustomerUpdated);
+    onAddCustomer(newCustomer);
     // Reset the form
     setNewCustomer({
-      id: `CTM-${index<10 ? "00": index<100 ? "0":""}${index}`,
+      id: Date.now(),
       name: '',
       email: '',
       phoneNumber: '',
@@ -70,7 +65,7 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({ onAddCustomer,newId }
       roomPreferences: '',
       Nationality: '',
     });
-    setImage(undefined);
+    setPreviewImage(null);
   };
 
   // Styling
@@ -138,8 +133,8 @@ const AddCustomerForm: React.FC<AddCustomerFormProps> = ({ onAddCustomer,newId }
   return (
     <form onSubmit={handleSubmit} style={formStyle}>
       <div style={imageBoxStyle}>
-        {image ? (
-          <img src={URL.createObjectURL(image)} alt="Customer Preview" style={imagePreviewStyle} />
+        {previewImage ? (
+          <img src={previewImage} alt="Customer Preview" style={imagePreviewStyle} />
         ) : (
           <p>No Image Selected</p>
         )}

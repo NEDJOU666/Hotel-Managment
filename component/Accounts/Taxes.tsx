@@ -52,7 +52,7 @@ const Taxes: React.FC = () => {
         <ul style={{ listStyleType: 'none', padding: '0' }}>
           {taxes.map(tax => (
             <li key={tax.id} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9' }}>
-              <strong>{tax.date}:</strong> {tax.type} - <strong>Amount:</strong> ${tax.amount.toFixed(2)}
+              <strong>{tax.date}:</strong> {tax.type} - <strong>Amount:</strong> XAF{tax.amount.toFixed(2)}
             </li>
           ))}
         </ul>

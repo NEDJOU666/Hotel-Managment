@@ -1,7 +1,4 @@
-"use client"
-import { urlFor } from '@/sanity/lib/image';
 import React, { useState } from 'react';
-import { client } from '@/sanity/lib/client';
 
 interface CustomerDetails {
   id: number;
@@ -18,14 +15,12 @@ interface CustomerDetails {
 
 interface EditCustomerFormProps {
   customer: CustomerDetails;
-  onUpdate:any
+  onUpdate: (updatedCustomer: CustomerDetails) => void;
 }
 
 const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customer, onUpdate }) => {
   const [updatedCustomer, setUpdatedCustomer] = useState<CustomerDetails>(customer);
-  const [selectedImage, setSelectedImage] = useState<File>();
-  const [imagePreview, setImagePreview] = useState(customer?.picture ? urlFor(customer.picture).url() : '');
-  // State for image preview
+  const [previewImage, setPreviewImage] = useState<string | null>(customer.picture || null); // State for image preview
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,45 +30,20 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customer, onUpdate 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setSelectedImage(file)
-      setImagePreview(URL.createObjectURL(file))
-    }
-  };
-  const uploadImage = async (file: any) => {
-    try {
-    const formData = new FormData();
-    formData.append('file', file);
+      const reader = new FileReader();
 
-    const uploadedImage = await client.assets.upload('image', file);
-      // Return the image asset ID
-      return uploadedImage._id;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      return "bad request"; // Rethrow the error for handling elsewhere
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+        setUpdatedCustomer({ ...updatedCustomer, picture: reader.result as string });
+      };
+
+      reader.readAsDataURL(file); // Convert image file to base64 string
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let imageToSave:any = customer.picture; // Default to the existing image
-
-    if (selectedImage) {
-      try {
-        // Upload the new image to Sanity
-        const uploadedImageID = await uploadImage(selectedImage);
-        imageToSave = {
-          _type: 'image',
-          asset: { _ref: uploadedImageID},
-        };
-      } catch (error) {
-        console.error('Image upload failed:', error);
-        return;
-      }
-    }
-    
-    const newUpdatedCustomer = {...updatedCustomer, picture: imageToSave};
-    onUpdate(newUpdatedCustomer);
-    
+    onUpdate(updatedCustomer);
   };
 
   // Styling
@@ -141,8 +111,8 @@ const EditCustomerForm: React.FC<EditCustomerFormProps> = ({ customer, onUpdate 
   return (
     <form onSubmit={handleSubmit} style={formStyle}>
       <div style={imageBoxStyle}>
-        {imagePreview ? (
-          <img src={imagePreview} alt="Customer Preview" style={imagePreviewStyle} />
+        {previewImage ? (
+          <img src={previewImage} alt="Customer Preview" style={imagePreviewStyle} />
         ) : (
           <p>No Image Selected</p>
         )}

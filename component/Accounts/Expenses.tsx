@@ -70,7 +70,7 @@ const Expenses: React.FC = () => {
   return (
     <div style={{ marginTop: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h2 style={{ color: 'green', textAlign: 'center' }}>Expenses</h2>
-      <p style={{ textAlign: 'center' }}><strong>Total Expenditure:</strong> ${getTotalExpenses().toFixed(2)}</p>
+      <p style={{ textAlign: 'center' }}><strong>Total Expenditure:</strong> XAF{getTotalExpenses().toFixed(2)}</p>
 
       <div style={{ maxWidth: '1500px', margin: '0 auto', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
@@ -113,7 +113,7 @@ const Expenses: React.FC = () => {
               <tr key={expense.id}>
                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>{expense.date}</td>
                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>{expense.category}</td>
-                <td style={{ border: '1px solid #ddd', padding: '8px' }}>${expense.amount.toFixed(2)}</td>
+                <td style={{ border: '1px solid #ddd', padding: '8px' }}>XAF{expense.amount.toFixed(2)}</td>
                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                   <button 
                     onClick={() => handleEditExpense(expense.id)} 

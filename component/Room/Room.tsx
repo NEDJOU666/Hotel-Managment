@@ -108,7 +108,7 @@ const Room  = ({index}:any) => {
       )}
       { Index == 1 &&  (
         <>
-          <h1>Choose a room to edit :</h1>
+          <h1 style={{ textAlign: 'center', color: 'black', marginBottom: '30px', fontSize: '24px', fontWeight: '600' }}>Choose a Room to Edit :</h1>
           <AllRoomsForm
             rooms={rooms}
             onEditClick={handleEditClick}

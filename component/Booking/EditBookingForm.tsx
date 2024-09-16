@@ -1,7 +1,24 @@
-"use client"
-import { useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
-import { BookingDetails } from '../interface/bookingDetails';
+
+interface Guest {
+  name: string;
+  age: number;
+}
+
+interface BookingDetails {
+  id: number;
+  name: string;
+  email: string;
+  checkInDate: string;
+  checkOutDate: string;
+  roomType: string;
+  roomComfort: string;
+  roomId: string;
+  amountPaid: number;
+  totalAmount: number;
+  guests: Guest[];
+  currency: string;
+}
 
 interface EditBookingFormProps {
   booking: BookingDetails;
@@ -29,18 +46,10 @@ const EditBookingForm: React.FC<EditBookingFormProps> = ({ booking, onUpdate }) 
 
   // Add a new guest
   const handleAddGuest = () => {
-    if(updatedBooking.guests){
-      setUpdatedBooking({
-        ...updatedBooking,
-        guests: [...updatedBooking.guests, { name: '', age: 0 }],
-      });
-    }
-    else{
-      setUpdatedBooking({
-        ...updatedBooking,
-        guests: [{ name: '', age: 0 }],
-      });
-    }
+    setUpdatedBooking({
+      ...updatedBooking,
+      guests: [...updatedBooking.guests, { name: '', age: 0 }],
+    });
   };
 
   // Remove a guest
@@ -155,7 +164,7 @@ const EditBookingForm: React.FC<EditBookingFormProps> = ({ booking, onUpdate }) 
       </div>
       <div>
         <label style={labelStyle}>Room Comfort:</label>
-        <select name="roomComfort" value={updatedBooking.roomConfort} onChange={handleChange} style={inputStyle}>
+        <select name="roomComfort" value={updatedBooking.roomComfort} onChange={handleChange} style={inputStyle}>
         <option value="standard">Standard</option>
           <option value="Low-Cash">Low-Cash</option>
           <option value="luxury">Luxury</option>
@@ -164,15 +173,15 @@ const EditBookingForm: React.FC<EditBookingFormProps> = ({ booking, onUpdate }) 
       </div>
       <div>
         <label style={labelStyle}>Room ID:</label>
-        <input type="text" name="roomId" value={updatedBooking.choosenRoom} onChange={handleChange} required style={inputStyle} />
+        <input type="text" name="roomId" value={updatedBooking.roomId} onChange={handleChange} required style={inputStyle} />
       </div>
       <div>
         <label style={labelStyle}>Amount Paid:</label>
-        <input type="number" name="amountPaid" value={updatedBooking.priceAnight} onChange={handleChange} required style={inputStyle} />
+        <input type="number" name="amountPaid" value={updatedBooking.amountPaid} onChange={handleChange} required style={inputStyle} />
       </div>
       <div>
         <label style={labelStyle}>Total Amount:</label>
-        <input type="number" name="totalAmount" value={updatedBooking.totalAmountPaid} onChange={handleChange} required style={inputStyle} />
+        <input type="number" name="totalAmount" value={updatedBooking.totalAmount} onChange={handleChange} required style={inputStyle} />
       </div>
       <div>
         <label style={labelStyle}>Currency:</label>
@@ -185,7 +194,7 @@ const EditBookingForm: React.FC<EditBookingFormProps> = ({ booking, onUpdate }) 
       </div>
       <div style={guestContainerStyle}>
         <label style={labelStyle}>Guests:</label>
-        {updatedBooking.guests && updatedBooking.guests.map((guest, index) => (
+        {updatedBooking.guests.map((guest, index) => (
           <div key={index} style={guestInputStyle}>
             <input
               type="text"

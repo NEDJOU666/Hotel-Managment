@@ -1,6 +1,24 @@
-"use client"
 import React, { useState, useEffect } from 'react';
-import { BookingDetails } from '../interface/bookingDetails';
+
+interface Guest {
+  name: string;
+  age: number;
+}
+
+interface BookingDetails {
+  id: number;
+  name: string;
+  email: string;
+  checkInDate: string;
+  checkOutDate: string;
+  roomType: string;
+  roomComfort: string;
+  roomId: string;
+  amountPaid: number;
+  totalAmount: number;
+  guests: Guest[];
+  currency: string;
+}
 
 interface Room {
   id: string;
@@ -11,13 +29,19 @@ interface Room {
 }
 
 interface AddBookingFormProps {
-  newId:number;
-  rooms:any
-  onAddBooking:any
-  booking:BookingDetails[]
+  onAddBooking: (newBooking: BookingDetails) => void;
 }
 
 // Mock data: list of available rooms with prices in XAF
+const availableRooms: Room[] = [
+  { id: 'RM1001', type: 'single', comfort: 'standard', price: 60000, available: true },
+  { id: 'RM1002', type: 'single', comfort: 'Low-Cash', price: 90000, available: true },
+  { id: 'RM2001', type: 'double', comfort: 'standard', price: 120000, available: false },
+  { id: 'RM2002', type: 'double', comfort: 'luxury', price: 150000, available: true },
+  { id: 'RM3001', type: 'suite', comfort: 'luxury', price: 550000, available: true },
+  { id: 'RM3002', type: 'suite', comfort: 'VIP', price: 250000, available: true },
+  { id: 'RM3003', type: 'single', comfort: 'luxury', price: 250000, available: true },
+];
 
 // Currency conversion rates (example values)
 const currencyRates: { [key: string]: number } = {
@@ -27,21 +51,18 @@ const currencyRates: { [key: string]: number } = {
   GBP: 0.0013,
 };
 
-const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, onAddBooking }) => {
-  const [index,setIndex] = useState(newId)
-  const [filteredRooms, setFilteredRooms] = useState<any[]>([]);
+const AddBookingForm: React.FC<AddBookingFormProps> = ({ onAddBooking }) => {
   const [newBooking, setNewBooking] = useState<BookingDetails>({
-    _id:"",
-    id: `BKG-${index<10 ? "00" : index < 100 ? "0" : ""}${index+1}`,
+    id: Date.now(),
     name: '',
     email: '',
     checkInDate: '',
     checkOutDate: '',
     roomType: 'single',
-    roomConfort: 'standard',
-    choosenRoom: '',
-    priceAnight: 0,
-    totalAmountPaid: 0,
+    roomComfort: 'standard',
+    roomId: '',
+    amountPaid: 0,
+    totalAmount: 0,
     guests: [{ name: '', age: 0 }, { name: '', age: 0 }],
     currency: 'XAF',
   });
@@ -59,41 +80,34 @@ const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, on
   // Calculate total amount based on number of days and amount paid per day
   const updateTotalAmount = () => {
     const days = calculateDays(newBooking.checkInDate, newBooking.checkOutDate);
-    const totalAmount = days * newBooking.priceAnight;
-    setNewBooking({ ...newBooking, totalAmountPaid: totalAmount });
+    const totalAmount = days * newBooking.amountPaid;
+    setNewBooking({ ...newBooking, totalAmount });
   };
-  useEffect(()=>{
-    const filteredRoom = rooms.filter((room:any) => {
-      const isRoomBooked = booking.some((bookingD:BookingDetails) => {
-        return bookingD.choosenRoom === room.id && 
-               ((new Date(newBooking.checkInDate) >= new Date(bookingD.checkInDate) && new Date(newBooking.checkInDate) < new Date(bookingD.checkOutDate)) ||
-               (new Date(newBooking.checkOutDate) > new Date(bookingD.checkInDate) && new Date(newBooking.checkOutDate) <= new Date(bookingD.checkOutDate)) ||
-               (new Date(newBooking.checkInDate) <= new Date(bookingD.checkInDate) && new Date(newBooking.checkOutDate) >= new Date(bookingD.checkOutDate)));
-      });
 
-      return !isRoomBooked;
-    });
-    setFilteredRooms(filteredRoom)
-  },[newBooking.checkInDate ,newBooking.checkOutDate,rooms,booking])
   // Update total amount and conversion whenever check-in, check-out, or room changes
   useEffect(() => {
     updateTotalAmount();
     convertCurrency(newBooking.currency);
-  }, [newBooking.checkInDate, newBooking.checkOutDate, newBooking.priceAnight, newBooking.currency]);
+  }, [newBooking.checkInDate, newBooking.checkOutDate, newBooking.amountPaid, newBooking.currency]);
 
   // Filter rooms based on the selected type and comfort
-  const availableRooms = rooms.filter((room:any) => room.type === newBooking.roomType && room.confort === newBooking.roomConfort);
+  const filteredRooms = availableRooms.filter(
+    (room) =>
+      room.type === newBooking.roomType &&
+      room.comfort === newBooking.roomComfort &&
+      room.available
+  );
 
   const handleRoomChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedRoom = filteredRooms.find((room:any) => room.id === e.target.value);
+    const selectedRoom = availableRooms.find((room) => room.id === e.target.value);
     if (selectedRoom) {
       setNewBooking({
         ...newBooking,
-        choosenRoom: selectedRoom.id,
-        priceAnight: selectedRoom.pricePerNight * 650 ,
+        roomId: selectedRoom.id,
+        amountPaid: selectedRoom.price,
       });
     } else {
-      setNewBooking({ ...newBooking, choosenRoom: '', priceAnight: 0 });
+      setNewBooking({ ...newBooking, roomId: '', amountPaid: 0 });
     }
   };
 
@@ -117,7 +131,7 @@ const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, on
   const convertCurrency = (currency: string) => {
     const rate = currencyRates[currency];
     if (rate) {
-      const convertedTotal = newBooking.totalAmountPaid * rate;
+      const convertedTotal = newBooking.totalAmount * rate;
       setConvertedAmount(convertedTotal);
     }
   };
@@ -126,19 +140,17 @@ const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, on
     e.preventDefault();
     onAddBooking(newBooking);
     // Reset the form
-    setIndex(index+1)
     setNewBooking({
-      _id:"",
-      id: `BKG-${index<10 && "00" }${index<10 && "0" }${index+1}`,
+      id: Date.now(),
       name: '',
       email: '',
       checkInDate: '',
       checkOutDate: '',
       roomType: 'single',
-      roomConfort: 'standard',
-      choosenRoom: '',
-      priceAnight: 0,
-      totalAmountPaid: 0,
+      roomComfort: 'standard',
+      roomId: '',
+      amountPaid: 0,
+      totalAmount: 0,
       guests: [{ name: '', age: 0 }, { name: '', age: 0 }],
       currency: 'XAF',
     });
@@ -285,7 +297,7 @@ const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, on
         <label style={labelStyle}>Room Comfort:</label>
         <select
           name="roomComfort"
-          value={newBooking.roomConfort}
+          value={newBooking.roomComfort}
           onChange={handleChange}
           required
           style={inputStyle}
@@ -300,7 +312,7 @@ const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, on
         <label style={labelStyle}>Room ID:</label>
         <select
           name="roomId"
-          value={newBooking.choosenRoom}
+          value={newBooking.roomId}
           onChange={handleRoomChange}
           required
           style={inputStyle}
@@ -308,7 +320,7 @@ const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, on
           <option value="">Select Room ID</option>
           {filteredRooms.map((room) => (
             <option key={room.id} value={room.id}>
-              {room.id}
+              {room.id} - {room.price.toLocaleString()} XAF
             </option>
           ))}
         </select>
@@ -318,7 +330,7 @@ const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, on
         <input
           type="number"
           name="amountPaid"
-          value={newBooking.priceAnight}
+          value={newBooking.amountPaid}
           readOnly
           style={inputStyle}
         />
@@ -328,7 +340,7 @@ const AddBookingForm: React.FC<AddBookingFormProps> = ({ newId,rooms,booking, on
         <input
           type="number"
           name="totalAmount"
-          value={newBooking.totalAmountPaid}
+          value={newBooking.totalAmount}
           readOnly
           style={inputStyle}
         />

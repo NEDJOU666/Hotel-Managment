@@ -14,14 +14,14 @@ const Invoices: React.FC<{ invoices: { id: number, details: string, amount: numb
         <p style={{ fontStyle: 'italic', fontSize: '12px', color: '#555' }}>Azure Hotel Official Receipt</p>
       </div>
       
-      <p><strong>Total Amount:</strong> ${getTotalAmount().toFixed(2)}</p>
+      <p><strong>Total Amount:</strong> XAF{getTotalAmount().toFixed(2)}</p>
       
       <ul style={{ listStyleType: 'none', padding: 0 }}>
         {invoices.map(invoice => (
           <li key={invoice.id} style={{ padding: '15px', borderBottom: '1px solid #ddd' }}>
             <strong>Date:</strong> {invoice.date} <br />
             <strong>Details:</strong> {invoice.details} <br />
-            <strong>Amount:</strong> ${invoice.amount.toFixed(2)} <br />
+            <strong>Amount:</strong> XAF{invoice.amount.toFixed(2)} <br />
             <strong>Method:</strong> {invoice.method} <br />
             <strong>Reference:</strong> {invoice.reference}
           </li>
