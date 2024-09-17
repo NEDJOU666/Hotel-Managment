@@ -1,11 +1,8 @@
+"use client"
 import React, { useState, useEffect } from 'react';
-
-interface RoomDetails {
-  id: number;
-  roomNumber: string;
-  roomType: string;
-  status: string;
-}
+import { RoomDetails } from '../interface/roomDetails';
+import { urlFor } from '@/sanity/lib/image';
+import { client } from '@/sanity/lib/client';
 
 interface EditRoomsFormProps {
   room: RoomDetails;
@@ -13,19 +10,53 @@ interface EditRoomsFormProps {
 }
 
 const EditRoomsForm: React.FC<EditRoomsFormProps> = ({ room, onEditRoom }) => {
-  const [roomNumber, setRoomNumber] = useState(room.roomNumber);
-  const [roomType, setRoomType] = useState(room.roomType);
-  const [status, setStatus] = useState(room.status);
+  const [updateRoom,setUpdateRoom] = useState(room)
+  const [imagePreview,setImagePreview] = useState(room.mainImage ? urlFor(room.mainImage).url() : " ")
+  const [selectedImage,setSelectedImage] = useState<File>()
+  
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedImage(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setUpdateRoom({ ...updateRoom, [name]: value });
+  };
+  const uploadImage = async (file: any) => {
+    try {
+    const formData = new FormData();
+    formData.append('file', file);
 
-  useEffect(() => {
-    setRoomNumber(room.roomNumber);
-    setRoomType(room.roomType);
-    setStatus(room.status);
-  }, [room]);
+    const uploadedImage = await client.assets.upload('image', file);
+      // Return the image asset ID
+      return uploadedImage._id;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return "bad request"; // Rethrow the error for handling elsewhere
+    }
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onEditRoom({ ...room, roomNumber, roomType, status });
+    let imageAsset = room.mainImage
+    if(selectedImage){
+      const imageAssetId = await uploadImage(selectedImage)
+      if(imageAssetId == "bad request") return;
+      imageAsset={
+        asset:{
+          _type:'refrence',
+          _ref:imageAssetId,
+        }
+      }
+    }
+    const newUpdateRoomWithImage:RoomDetails =  {
+      ...updateRoom,
+      mainImage:imageAsset
+    }
+    onEditRoom(newUpdateRoomWithImage);
   };
 
   const containerStyle: React.CSSProperties = {
@@ -66,49 +97,103 @@ const EditRoomsForm: React.FC<EditRoomsFormProps> = ({ room, onEditRoom }) => {
     textTransform: 'uppercase',
   };
 
-  return (
-    <div style={containerStyle}>
-      <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333', fontSize: '26px', fontWeight: 'bold' }}>Edit Room</h2>
-      <form onSubmit={handleSubmit}>
+  
+    return (
+      <div style={containerStyle}>
+        <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#333', fontSize: '26px', fontWeight: 'bold' }}>Add New Room</h2>
+        <form onSubmit={handleSubmit}>
         <div>
-          <label style={{ marginBottom: '8px', display: 'block', color: '#555', fontSize: '16px' }}>Room Number:</label>
-          <input
-            type="text"
-            value={roomNumber}
-            onChange={(e) => setRoomNumber(e.target.value)}
-            style={inputStyle}
-            placeholder="Enter Room Number"
-            required
-          />
-        </div>
-        <div>
+            <label style={{ marginBottom: '8px', display: 'block', color: '#555', fontSize: '16px' }}>Main Image:</label>
+            {
+              imagePreview ? (
+                <img src={imagePreview} className=' h-[200px] w-[400px] rounded-md mb-3' alt="" />
+              ):(
+                <div className=" w-[400px] h-[100px] border-[2px] rounded-md mb-3 flex items-center justify-center">No Image Selected</div>
+              )
+            }
+            <input
+              type="file"
+              name='main Image'
+              style={inputStyle}
+              onChange={handleImageChange}
+              placeholder="Main Image"
+            />
+          </div>
+          <div>
+            <label style={{ marginBottom: '8px', display: 'block', color: '#555', fontSize: '16px' }}>Room Number:</label>
+            <input
+              type="text"
+              name='id'
+              value={updateRoom.id}
+              disabled
+              style={inputStyle}
+              placeholder=" Room Number"
+              required
+            />
+          </div>
+          
+          <div>
           <label style={{ marginBottom: '8px', display: 'block', color: '#555', fontSize: '16px' }}>Room Type:</label>
-          <input
-            type="text"
-            value={roomType}
-            onChange={(e) => setRoomType(e.target.value)}
-            style={inputStyle}
-            placeholder="Enter Room Type"
-            required
-          />
-        </div>
-        <div>
-          <label style={{ marginBottom: '8px', display: 'block', color: '#555', fontSize: '16px' }}>Status:</label>
           <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            style={selectStyle}
+            name="type"
+            value={updateRoom.type}
+            onChange={handleChange}
+            required
+            style={inputStyle}
           >
-            <option value="Available">Available</option>
-            <option value="Occupied">Occupied</option>
-            <option value="Maintenance">Maintenance</option>
+            <option value="single">Single</option>
+            <option value="double">Double</option>
+            <option value="suite">Suite</option>
           </select>
         </div>
-        <button type="submit" style={buttonStyle}>
-          Update Room
-        </button>
-      </form>
-    </div>
+        <div>
+          <label style={{ marginBottom: '8px', display: 'block', color: '#555', fontSize: '16px' }}>Room Confort:</label>
+          <select
+            name="confort"
+            value={updateRoom.confort}
+            onChange={handleChange}
+            required
+            style={inputStyle}
+          >
+            <option value="standard">Standard</option>
+            <option value="Low-Cash">Low-Cash</option>
+            <option value="luxury">Luxury</option>
+            <option value="VIP">VIP</option>
+          </select>
+        </div>
+          <div>
+            <label style={{ marginBottom: '8px', display: 'block', color: '#555', fontSize: '16px' }}>Status:</label>
+            <select
+            name='status'
+              value={updateRoom.status}
+              onChange={handleChange}
+              style={selectStyle}
+            >
+              <option value="Available">Available</option>
+              <option value="Occupied">Occupied</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ marginBottom: '8px', display: 'block', color: '#555', fontSize: '16px' }}>Price Per Night:</label>
+            <input
+              type="text"
+              name='pricePerNight'
+              value={updateRoom.pricePerNight}
+              onChange={handleChange}
+              style={inputStyle}
+              placeholder=" Enter the price"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            style={buttonStyle}
+          >
+            Add Room
+          </button>
+        </form>
+      </div>
   );
 };
 

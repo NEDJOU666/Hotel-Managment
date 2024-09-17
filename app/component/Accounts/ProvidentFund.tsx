@@ -1,18 +1,21 @@
+"use client"
 import React, { useState } from 'react';
+import { Contributor } from '../interface/contributorDetail';
 
-const ProvidentFund: React.FC = () => {
-  const [contributions, setContributions] = useState<{ id: number, name: string, amount: number, date: string }[]>([]);
+const ProvidentFund = ({contributors,onAddContributor}:{contributors:Contributor[],onAddContributor:any}) => {
+  const [contributions, setContributions] = useState<{ id: number, name: string, amount: number, date: string }[]>(contributors);
   const [name, setName] = useState<string>('');
   const [amount, setAmount] = useState<number>(0);
 
-  const handleAddContribution = () => {
+  const handleAddContribution = async () => {
     if (name && amount > 0) {
       const newContribution = {
-        id: contributions.length + 1,
+        id: contributors.length + 1,
         name,
         amount,
         date: new Date().toLocaleDateString()
       };
+      await onAddContributor(newContribution)
       setContributions([...contributions, newContribution]);
       setName('');
       setAmount(0);
@@ -20,7 +23,7 @@ const ProvidentFund: React.FC = () => {
   };
 
   const getTotalBalance = () => {
-    return contributions.reduce((total, contribution) => total + contribution.amount, 0);
+    return contributors.reduce((total, contribution) => total + contribution.amount, 0);
   };
 
   return (
@@ -28,7 +31,7 @@ const ProvidentFund: React.FC = () => {
       <h2 style={{ color: 'green', textAlign: 'center' }}>Provident Fund</h2>
       <p style={{ fontSize: '18px', textAlign: 'center' }}><strong>Total Balance:</strong> ${getTotalBalance().toFixed(2)}</p>
       <ul style={{ listStyleType: 'none', padding: '0' }}>
-        {contributions.map(contribution => (
+        {contributors.map(contribution => (
           <li key={contribution.id} style={{ padding: '10px', borderBottom: '1px solid #ddd' }}>
             <strong>{contribution.date}:</strong> {contribution.name} contributed ${contribution.amount.toFixed(2)}
           </li>

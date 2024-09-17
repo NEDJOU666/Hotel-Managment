@@ -1,12 +1,8 @@
+"use client"
 import React, { useState } from 'react';
-
+import { Expense } from '../interface/expensesDetails';
+import exp from 'constants';
 // Define the expense type for better type safety
-interface Expense {
-  id: number;
-  category: string;
-  amount: number;
-  date: string;
-}
 
 // List of common hotel expense categories
 const expenseCategories = [
@@ -23,26 +19,36 @@ const expenseCategories = [
   'Property Taxes',
 ];
 
-const Expenses: React.FC = () => {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+const Expenses = ({expenses ,onAdd,onEdit,onDelete}:{expenses:Expense[],onAdd:any,onEdit:any,onDelete:any}) => {
+  const [Expenses, setExpenses] = useState<Expense[]>([]);
   const [category, setCategory] = useState<string>('');
   const [amount, setAmount] = useState<number>(0);
-  const [editExpenseId, setEditExpenseId] = useState<number | null>(null);
-
-  const handleAddExpense = () => {
+  const [editExpenseId, setEditExpenseId] = useState<string | null>(null);
+  const [deleting,setDeleting] = useState(false)
+  const handleAddExpense = async () => {
     if (category && amount > 0) {
-      const newExpense = {
-        id: editExpenseId ?? expenses.length + 1,
-        category,
-        amount,
-        date: new Date().toLocaleDateString()
-      };
+    const  idEx = editExpenseId ? expenses.find(expense => expense._id == editExpenseId) : expenses[0]
+      const newExpense = !editExpenseId ? {
+          id:expenses.length + 1,
+          category,
+          amount,
+          date: new Date().toLocaleDateString()
+        
+      }:{
+        _id:idEx?._id,
+        id:idEx?.id,
+          category,
+          amount,
+          date: new Date().toLocaleDateString()
+      }
 
       if (editExpenseId !== null) {
-        setExpenses(expenses.map(expense => expense.id === editExpenseId ? newExpense : expense));
-        setEditExpenseId(null);
+        onEdit(newExpense)
+          
+          setEditExpenseId(null);
+        
       } else {
-        setExpenses([...expenses, newExpense]);
+       await onAdd(newExpense)
       }
 
       setCategory('');
@@ -50,17 +56,22 @@ const Expenses: React.FC = () => {
     }
   };
 
-  const handleEditExpense = (id: number) => {
-    const expenseToEdit = expenses.find(expense => expense.id === id);
+  const handleEditExpense = async (_id: string) => {
+    
+    const expenseToEdit = expenses.find(expense => expense._id === _id);
     if (expenseToEdit) {
+      
       setCategory(expenseToEdit.category);
       setAmount(expenseToEdit.amount);
-      setEditExpenseId(id);
+      setEditExpenseId(_id);
     }
   };
 
-  const handleDeleteExpense = (id: number) => {
-    setExpenses(expenses.filter(expense => expense.id !== id));
+  const handleDeleteExpense = async (_id: string) => {
+    setDeleting(true)
+    await onDelete(_id)
+    setExpenses(expenses.filter(expense => expense._id !== _id));
+    setDeleting(false)
   };
 
   const getTotalExpenses = () => {
@@ -116,16 +127,16 @@ const Expenses: React.FC = () => {
                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>${expense.amount.toFixed(2)}</td>
                 <td style={{ border: '1px solid #ddd', padding: '8px' }}>
                   <button 
-                    onClick={() => handleEditExpense(expense.id)} 
+                    onClick={() => handleEditExpense(expense._id ? expense._id : "")} 
                     style={{ marginRight: '10px', padding: '5px 10px', backgroundColor: 'blue', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                   >
                     Edit
                   </button>
                   <button 
-                    onClick={() => handleDeleteExpense(expense.id)} 
+                    onClick={() => handleDeleteExpense(expense._id ? expense._id : "")} 
                     style={{ padding: '5px 10px', backgroundColor: 'red', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                   >
-                    Delete
+                    { deleting ? 'Deleting...': 'Delete'}
                   </button>
                 </td>
               </tr>

@@ -1,18 +1,18 @@
+"use client"
 import React, { useState } from 'react';
-
+import { Tax } from '../interface/taxDetails';
 // Define the tax entry type
-interface Tax {
-  id: number;
-  type: string;
-  amount: number;
-  date: string;
-}
+
 
 // Define a type for tax categories and their details
 interface TaxCategory {
   id: number;
   name: string;
   details: string;
+}
+interface taxProprs {
+  Taxes : Tax[],
+  onAddTax : any
 }
 
 // Sample tax categories
@@ -23,19 +23,20 @@ const taxCategories: TaxCategory[] = [
   { id: 4, name: 'Corporate Tax', details: 'Tax paid by corporations on their profits.' },
 ];
 
-const Taxes: React.FC = () => {
-  const [taxes, setTaxes] = useState<Tax[]>([]);
+const Taxes: React.FC<taxProprs> = ({Taxes,onAddTax}) => {
+  const [taxes, setTaxes] = useState<Tax[]>(Taxes);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [amount, setAmount] = useState<number>(0);
 
-  const handleAddTax = () => {
+  const handleAddTax = async () => {
     if (selectedCategory && amount > 0) {
       const newTax = {
-        id: taxes.length + 1,
+        id: Taxes.length + 1,
         type: selectedCategory,
         amount,
         date: new Date().toLocaleDateString()
       };
+     await onAddTax(newTax)
       setTaxes([...taxes, newTax]);
       setSelectedCategory('');
       setAmount(0);
@@ -50,9 +51,9 @@ const Taxes: React.FC = () => {
 
       <div style={{ marginBottom: '20px' }}>
         <ul style={{ listStyleType: 'none', padding: '0' }}>
-          {taxes.map(tax => (
+          {Taxes.map(tax => (
             <li key={tax.id} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9' }}>
-              <strong>{tax.date}:</strong> {tax.type} - <strong>Amount:</strong> ${tax.amount.toFixed(2)}
+              <strong>{tax.date}:</strong> {tax.type} - <strong>Amount:</strong> ${tax.amount ? tax.amount.toFixed(2) : 'N/A'}
             </li>
           ))}
         </ul>

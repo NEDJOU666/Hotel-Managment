@@ -1,20 +1,17 @@
+"use client"
 import React, { useState } from 'react';
-
-interface RoomDetails {
-  id: number;
-  roomNumber: string;
-  roomType: string;
-  status: string;
-
-}
+import { RoomDetails } from '../interface/roomDetails';
+import { useRouter } from 'next/navigation';
 
 interface AllRoomsFormProps {
   rooms: RoomDetails[];
-  onEditClick: (room: RoomDetails) => void;
-  onDeleteClick: (roomId: number) => void;
+  onDeleteClick: (roomId: string) => void;
 }
 
-const AllRoomsForm: React.FC<AllRoomsFormProps> = ({ rooms, onEditClick, onDeleteClick }) => {
+
+
+const AllRoomsForm: React.FC<AllRoomsFormProps> = ({ rooms, onDeleteClick }) => {
+  const router = useRouter()
   const [selectedRoom, setSelectedRoom] = useState<RoomDetails | null>(null);
 
   const handleViewDetailsClick = (room: RoomDetails) => {
@@ -82,7 +79,7 @@ const AllRoomsForm: React.FC<AllRoomsFormProps> = ({ rooms, onEditClick, onDelet
             style={listItemStyle}
           >
             <div>
-              <strong style={{ fontSize: '18px', color: '#555' }}>Room {room.roomNumber}</strong> - {room.roomType} - {room.status}
+              <strong style={{ fontSize: '18px', color: '#555' }}>Room {room.id}</strong> - {room.type} - {room.status}
             </div>
             <div style={buttonContainerStyle}>
               <button
@@ -92,13 +89,13 @@ const AllRoomsForm: React.FC<AllRoomsFormProps> = ({ rooms, onEditClick, onDelet
                 View Details
               </button>
               <button
-                onClick={() => onEditClick(room)}
+                onClick={() => router.push(`/rooms/editrooms/${room._id}`)}
                 style={{ ...buttonStyle, backgroundColor: '#2ecc71' }}
               >
                 Edit
               </button>
               <button
-                onClick={() => onDeleteClick(room.id)}
+                onClick={() => onDeleteClick(room._id ? room._id : "")}
                 style={{ ...buttonStyle, backgroundColor: '#e74c3c' }}
               >
                 Delete
@@ -111,8 +108,10 @@ const AllRoomsForm: React.FC<AllRoomsFormProps> = ({ rooms, onEditClick, onDelet
       {selectedRoom && (
         <div style={detailsStyle}>
           <h3 style={{ marginBottom: '20px', fontSize: '20px', color: '#444' }}>Room Details</h3>
-          <p style={detailItemStyle}><strong>Room Number:</strong> {selectedRoom.roomNumber}</p>
-          <p style={detailItemStyle}><strong>Room Type:</strong> {selectedRoom.roomType}</p>
+          <p style={detailItemStyle}><strong>Room Number:</strong> {selectedRoom.id}</p>
+          <p style={detailItemStyle}><strong>Room Type:</strong> {selectedRoom.type}</p>
+          <p style={detailItemStyle}><strong>Room Type:</strong> {selectedRoom.confort}</p>
+          <p style={detailItemStyle}><strong>Room Type:</strong> {selectedRoom.pricePerNight} Xaf</p>
           <p style={detailItemStyle}><strong>Status:</strong> {selectedRoom.status}</p>
         </div>
       )}

@@ -1,3 +1,4 @@
+"use client"
 const Calendar = () => {
     const months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const weekdays = ["", "sun", "mon", "tue", "wed", "thr", "fri", "sat"];

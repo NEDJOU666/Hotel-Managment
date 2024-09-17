@@ -3,30 +3,21 @@ import React, { useState } from 'react';
 import styles from './Staff.module.css';
 import { StaffDetails } from '../interface/staffDetails';
 interface StaffFormProps {
-  onSave: (staff: StaffDetails) => void;
+  onEdit: (staff: StaffDetails) => void;
+  staff: StaffDetails;
 }
 
 
 
-const StaffForm: React.FC<StaffFormProps> = ({  onSave }) => {
- const [newStaff,setStaff] =  useState<StaffDetails>({
-  name:'',
-  email:'',
-  position: '',
-  department: '',
-  contact: '',
-  dateOfHire: '',
-  salary: 0,
-  leave:false,
-  holidays:false
- })
+const StaffForm: React.FC<StaffFormProps> = ({ staff, onEdit }) => {
+ const [updateStaff,setStaff] =  useState<StaffDetails>(staff)
  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
    const {name, value} = e.target
-   setStaff({...newStaff, [name]:value})
+   setStaff({...updateStaff, [name]:value})
  }
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSave( newStaff);
+    onEdit(updateStaff);
   };
 
   return (
@@ -35,7 +26,7 @@ const StaffForm: React.FC<StaffFormProps> = ({  onSave }) => {
         type="text"
         placeholder="Name"
         name='name'
-        value={newStaff.name}
+        value={updateStaff.name}
         onChange={handleChange}
         className={styles.input}
         required
@@ -44,7 +35,7 @@ const StaffForm: React.FC<StaffFormProps> = ({  onSave }) => {
         type="text"
         placeholder="Email"
         name='email'
-        value={newStaff.email}
+        value={updateStaff.email}
         onChange={handleChange}
         className={styles.input}
         required
@@ -52,7 +43,7 @@ const StaffForm: React.FC<StaffFormProps> = ({  onSave }) => {
       <input
         type="text"
         placeholder="Position"
-        value={newStaff.position}
+        value={updateStaff.position}
         name='position'
         onChange={handleChange}
         className={styles.input}
@@ -61,7 +52,7 @@ const StaffForm: React.FC<StaffFormProps> = ({  onSave }) => {
       <input
         type="text"
         placeholder="Department"
-        value={newStaff.department}
+        value={updateStaff.department}
         name='department'
         onChange={handleChange}
         className={styles.input}
@@ -71,7 +62,7 @@ const StaffForm: React.FC<StaffFormProps> = ({  onSave }) => {
         type="text"
         placeholder="Contact"
         name='contact'
-        value={newStaff.contact}
+        value={updateStaff.contact}
         onChange={handleChange}
         className={styles.input}
         required
@@ -80,7 +71,7 @@ const StaffForm: React.FC<StaffFormProps> = ({  onSave }) => {
         type="date"
         placeholder="Date of Hire"
         name='dateOfHire'
-        value={newStaff.dateOfHire}
+        value={updateStaff.dateOfHire}
         onChange={handleChange}
         className={styles.input}
         required
@@ -89,7 +80,7 @@ const StaffForm: React.FC<StaffFormProps> = ({  onSave }) => {
         type="number"
         placeholder="Salary"
         name='salary'
-        value={newStaff.salary}
+        value={updateStaff.salary}
         onChange={handleChange}
         className={styles.input}
         required
